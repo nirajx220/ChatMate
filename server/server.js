@@ -5,14 +5,27 @@ import cors from 'cors';
 
 const app = express();
 const httpServer = createServer(app);
+
+// CORS origins - add your deployed frontend URL
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  process.env.CLIENT_URL,
+  process.env.RENDER_EXTERNAL_URL
+].filter(Boolean);
+
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:5174"],
-    methods: ["GET", "POST"]
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
-app.use(cors());
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 app.use(express.json());
 
 // In-memory storage (in production, use a database like MongoDB)
@@ -98,6 +111,15 @@ io.on('connection', (socket) => {
 });
 
 // REST API routes
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'ChatMate Server is running',
+    activeUsers: activeUsers.size,
+    totalMessages: Array.from(messages.values()).reduce((sum, msgs) => sum + msgs.length, 0)
+  });
+});
+
 app.get('/api/users', (req, res) => {
   res.json(Array.from(users.values()));
 });
