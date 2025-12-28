@@ -152,7 +152,6 @@ The server provides the following Socket.io events:
 - Implement message persistence
 - Add file upload handling for images
 
-## License
 
-This project is open source and available for educational purposes.
+
 
